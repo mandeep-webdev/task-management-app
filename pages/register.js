@@ -1,6 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { auth } from '../firebase/firebase';
+import { useRouter } from 'next/router';
+import Loader from '@/components/Loader';
+import { useContext } from 'react';
+import { AuthUserContext } from '@/firebase/auth';
+import Link from 'next/link';
 import {
   createUserWithEmailAndPassword,
   updateProfile,
@@ -15,6 +20,15 @@ const RegisterForm = () => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
 
+  const { authUser, loading, setAuthUser } = useContext(AuthUserContext);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (authUser && !loading) {
+      router.push('/');
+    }
+  }, [authUser, loading]);
+
   const signupHandler = async () => {
     if (!username || !email || !password) {
       return;
@@ -23,6 +37,11 @@ const RegisterForm = () => {
       const user = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(auth.currentUser, {
         displayName: username,
+      });
+      setAuthUser({
+        userId: user.uid,
+        email: user.email,
+        username,
       });
       console.log(user);
     } catch (error) {
@@ -39,16 +58,21 @@ const RegisterForm = () => {
     }
   };
 
-  return (
+  return loading || (authUser && !loading) ? (
+    <Loader />
+  ) : (
     <main className="flex lg:h-[100vh]">
       <div className="w-full lg:w-[60%] p-8 md:p-14 flex items-center justify-center lg:justify-start">
         <div className="p-8 w-[600px]">
           <h1 className="text-6xl font-semibold">Sign Up</h1>
           <p className="mt-6 ml-1">
             Already have an account ?{' '}
-            <span className="underline hover:text-blue-400 cursor-pointer">
+            <Link
+              href="/login"
+              className="underline hover:text-blue-400 cursor-pointer"
+            >
               Login
-            </span>
+            </Link>
           </p>
 
           <div
@@ -110,7 +134,7 @@ const RegisterForm = () => {
       <div
         className="w-[40%] bg-slate-400 bg-cover bg-right-top hidden lg:block"
         style={{
-          backgroundImage: "url('/login-banner.jpg')",
+          backgroundImage: "url('/banner.jpg')",
         }}
       ></div>
     </main>

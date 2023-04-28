@@ -4,6 +4,8 @@ import { useContext } from 'react';
 import { AuthUserContext } from '@/firebase/auth';
 import { auth } from '../firebase/firebase';
 import { useRouter } from 'next/router';
+import Loader from '@/components/Loader';
+import Link from 'next/link';
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -46,7 +48,7 @@ const LoginForm = () => {
   };
 
   return loading || (authUser && !loading) ? (
-    'Loading...'
+    <Loader />
   ) : (
     <main className="flex lg:h-[100vh]">
       <div className="w-full lg:w-[60%] p-8 md:p-14 flex items-center justify-center lg:justify-start">
@@ -54,9 +56,12 @@ const LoginForm = () => {
           <h1 className="text-6xl font-semibold">Login</h1>
           <p className="mt-6 ml-1">
             Don't have an account ?{' '}
-            <span className="underline hover:text-blue-400 cursor-pointer">
+            <Link
+              href="/register"
+              className="underline hover:text-blue-400 cursor-pointer"
+            >
               Sign Up
-            </span>
+            </Link>
           </p>
 
           <div
@@ -107,7 +112,7 @@ const LoginForm = () => {
       <div
         className="w-[40%] bg-slate-400 bg-cover bg-right-top hidden lg:block"
         style={{
-          backgroundImage: "url('/login-banner.jpg')",
+          backgroundImage: "url('/banner.jpg')",
         }}
       ></div>
     </main>
